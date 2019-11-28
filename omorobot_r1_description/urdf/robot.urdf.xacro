@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<robot name="omorobot_r1" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="wheel_diameter" value="0.22"/>
+    <xacro:property name="wheel_speration" value="0.56"/>
+
+    <link name="base_footprint"/>
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/base.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/base.dae" scale="1 1 1"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="7.054081"/>
+            <origin xyz="-0.012841 0.000000 0.071507"/>
+            <inertia ixx="0.031237" ixy="0.0" ixz="0.000870" iyy="0.039718" iyz="0.0" izz="0.043120"/>
+        </inertial>
+    </link>
+
+    <joint name="base_fixed_joint" type="fixed">
+        <parent link="base_footprint"/>
+        <child link="base_link"/>
+        <origin xyz="0 0 ${wheel_diameter/2}" rpy="0 0 0"/>
+    </joint>
+
+    <link name="l_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/wheel.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/wheel.dae" scale="1 1 1"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="7.054081"/>
+            <origin xyz="-0.012841 0.000000 0.071507"/>
+            <inertia ixx="0.031237" ixy="0.0" ixz="0.000870" iyy="0.039718" iyz="0.0" izz="0.043120"/>
+        </inertial>
+    </link>
+
+    <joint name="l_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="l_wheel"/>
+        <origin xyz="0 ${wheel_speration/2} 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="r_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/wheel.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/wheel.dae" scale="1 1 1"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="7.054081"/>
+            <origin xyz="-0.012841 0.000000 0.071507"/>
+            <inertia ixx="0.031237" ixy="0.0" ixz="0.000870" iyy="0.039718" iyz="0.0" izz="0.043120"/>
+        </inertial>
+    </link>
+
+    <joint name="r_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="r_wheel"/>
+        <origin xyz="0 ${-wheel_speration/2} 0" rpy="0 0 0"/>
+    </joint>
+
+</robot>
