@@ -1,0 +1,12 @@
+<launch>
+    <!-- <env name="GAZEBO_RESOURCE_PATH" value="$(find mobile_robot_gazebo)"/> -->
+
+    <include file="$(find omorobot_r1_description)/launch/upload_robot.launch"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="use_sim_time" value="true" />
+        <arg name="verbose" value="true"/>
+    </include>
+
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -model omorobot_r1 -param robot_description"/>
+</launch>

@@ -3,6 +3,9 @@
     <xacro:property name="wheel_diameter" value="0.22"/>
     <xacro:property name="wheel_speration" value="0.56"/>
 
+    <xacro:include filename="$(find omorobot_r1_description)/urdf/gazebo.urdf.xacro"/>
+    <xacro:include filename="$(find omorobot_r1_description)/urdf/transmission.urdf.xacro"/>
+
     <link name="base_footprint"/>
 
     <link name="base_link">
@@ -19,9 +22,9 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="7.054081"/>
-            <origin xyz="-0.012841 0.000000 0.071507"/>
-            <inertia ixx="0.031237" ixy="0.0" ixz="0.000870" iyy="0.039718" iyz="0.0" izz="0.043120"/>
+            <mass value="35.0"/>
+            <origin xyz="-0.150641 0 0.020826"/>
+            <inertia ixx="0.873747" ixy="0.0" ixz="0.000870" iyy="0.905702" iyz="0.0" izz="1.375955"/>
         </inertial>
     </link>
 
@@ -45,17 +48,19 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="7.054081"/>
-            <origin xyz="-0.012841 0.000000 0.071507"/>
-            <inertia ixx="0.031237" ixy="0.0" ixz="0.000870" iyy="0.039718" iyz="0.0" izz="0.043120"/>
+            <mass value="1.0"/>
+            <origin xyz="0.0 0.01 0.0"/>
+            <inertia ixx="0.003306" ixy="0.0" ixz="0.0" iyy="0.006011" iyz="0.0" izz="0.003306"/>
         </inertial>
     </link>
 
     <joint name="l_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="l_wheel"/>
+        <axis xyz="0 1 0"/>
         <origin xyz="0 ${wheel_speration/2} 0" rpy="0 0 0"/>
     </joint>
+    <xacro:insert_velocity_transmission name="l_wheel_joint"/>
 
     <link name="r_wheel">
         <visual>
@@ -71,16 +76,43 @@
             </geometry>
         </collision>
         <inertial>
-            <mass value="7.054081"/>
-            <origin xyz="-0.012841 0.000000 0.071507"/>
-            <inertia ixx="0.031237" ixy="0.0" ixz="0.000870" iyy="0.039718" iyz="0.0" izz="0.043120"/>
+            <mass value="1.0"/>
+            <origin xyz="0.0 -0.01 0.0"/>
+            <inertia ixx="0.003306" ixy="0.0" ixz="0.0" iyy="0.006011" iyz="0.0" izz="0.003306"/>
         </inertial>
     </link>
 
     <joint name="r_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="r_wheel"/>
+        <axis xyz="0 1 0"/>
         <origin xyz="0 ${-wheel_speration/2} 0" rpy="0 0 0"/>
     </joint>
+    <xacro:insert_velocity_transmission name="r_wheel_joint"/>
 
+    <link name="lidar_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/lidar.dae" scale="1 1 1"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://omorobot_r1_description/meshes/lidar.dae" scale="1 1 1"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.01"/>
+            <origin xyz="0.008122 0.000115 -0.010876"/>
+            <inertia ixx="0.000034" ixy="0.0" ixz="0.0" iyy="0.000064" iyz="0.0" izz="0.000082"/>
+        </inertial>
+    </link>
+
+    <joint name="lidar_fixed_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="lidar_link"/>
+        <origin xyz="0.095 0 0.185" rpy="0 0 0"/>
+    </joint>
 </robot>
