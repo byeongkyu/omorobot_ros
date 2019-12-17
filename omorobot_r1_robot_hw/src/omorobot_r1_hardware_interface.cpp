@@ -59,6 +59,22 @@ bool OmoRobotR1HardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& pnh
     ros::Duration(2.0).sleep();
     std::string buf = serial_port_->ReadLine(100, '\n');
 
+    // Disabled the feedback for command
+    serial_port_->Write("$SCBEN,0\r\n");
+    ros::Duration(0.5).sleep();
+
+    // Get initial encoder value;
+    serial_port_->Write("$QENCOD\r\n");
+    buf = serial_port_->ReadLine(100, '\n');
+    std::vector<std::string> results;
+    boost::algorithm::split(results, buf, boost::is_any_of(","));
+
+    last_encoder_vel[0] = std::stod(results[1]);
+    last_encoder_vel[1] = std::stod(results[2]);
+
+    ROS_INFO("[%s] initital ecoder value %.1f %.1f", ros::this_node::getName().c_str(), last_encoder_vel[0], last_encoder_vel[1]);
+
+
     // hardware_interface
     joint_cmd_.resize(2);
     for(int i = 0; i < joint_cmd_.size(); i++) {
@@ -90,22 +106,27 @@ bool OmoRobotR1HardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& pnh
 void OmoRobotR1HardwareInterface::read(const ros::Time& time, const ros::Duration& period)
 {
     std::string buf;
-    serial_port_->Write("$QRPM\r\n");
-    ros::Duration(0.005).sleep();
+    std::vector<std::string> results;
+
+    serial_port_->Write("$QENCOD\r\n");
 
     try
     {
-        buf = serial_port_->ReadLine(100, '\n');
-        if(buf.substr(0, 5) == "#QRPM")
+        buf = serial_port_->ReadLine(1000, '\n');
+        if(buf.substr(0, 7) == "#QENCOD")
         {
-            std::vector<std::string> results;
             boost::algorithm::split(results, buf, boost::is_any_of(","));
+            joint_vel_[0] = (std::stod(results[1]) - last_encoder_vel[0]) / 60000.0 * period.toSec() * M_PI;
+            joint_vel_[1] = (std::stod(results[2]) - last_encoder_vel[1]) / 60000.0 * period.toSec() * M_PI;
 
-            double current_l_vel = std::stod(results[1]) / 60.0 / wheel_gear_ratio_ * M_PI;
-            double current_r_vel = std::stod(results[2]) / 60.0 / wheel_gear_ratio_ * M_PI;
+            joint_pos_[0] += joint_vel_[0] / period.toSec();
+            joint_pos_[1] += joint_vel_[1] / period.toSec();
 
-            ROS_INFO("%f %f", current_l_vel, current_r_vel);
+            ROS_INFO("%f %f, %f, %f", joint_vel_[0], joint_pos_[0], joint_vel_[1], joint_pos_[1]);
         }
+
+        last_encoder_vel[0] = std::stod(results[1]);
+        last_encoder_vel[1] = std::stod(results[2]);
     }
     catch(...)
     {
@@ -115,9 +136,7 @@ void OmoRobotR1HardwareInterface::read(const ros::Time& time, const ros::Duratio
 
 void OmoRobotR1HardwareInterface::write(const ros::Time& time, const ros::Duration& period)
 {
-    serial_port_->Write("$CRPM,3600,3600\r\n");
-    ros::Duration(0.005).sleep();
-    std::string buf = serial_port_->ReadLine(100, '\n');
+    serial_port_->Write("$CRPM,60,60\r\n");
 }
 
 bool OmoRobotR1HardwareInterface::prepareSwitch(

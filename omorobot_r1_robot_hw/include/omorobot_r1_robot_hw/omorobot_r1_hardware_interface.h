@@ -32,6 +32,7 @@ class OmoRobotR1HardwareInterface: public hardware_interface::RobotHW
         std::vector<double> joint_eff_;
 
         double wheel_gear_ratio_;
+        double last_encoder_vel[2];
 
         boost::shared_ptr<SerialPort> serial_port_;
 };
